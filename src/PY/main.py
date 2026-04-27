@@ -15,6 +15,7 @@ TEXT_MUTED  = "#607080"
 BORDER      = "#d0dce8"
 RED         = "#e53935"
 RED_LIGHT   = "#ffebee"
+GRAY        = "#515151"
 
 GANTT_COLORS = [
     ("#b2ebf2", "#006064"),
@@ -103,14 +104,14 @@ class App(tk.Tk):
 
     # ── Header ─────────────────────────────────────────────────────────────────
     def _build_header(self):
-        hdr = tk.Frame(self, bg=CYAN, height=56)
+        hdr = tk.Frame(self, bg=GRAY, height=56)
         hdr.pack(fill="x")
         hdr.pack_propagate(False)
 
-        tk.Label(hdr, text="⚙", bg=CYAN, fg=WHITE,
+        tk.Label(hdr, text="⚙", bg=GRAY, fg=WHITE,
                  font=("Segoe UI Emoji", 20)).pack(side="left", padx=(18, 8), pady=10)
         tk.Label(hdr, text="Simulador de Escalonamento de CPU",
-                 bg=CYAN, fg=WHITE,
+                 bg=GRAY, fg=WHITE,
                  font=("Segoe UI", 14, "bold")).pack(side="left", pady=10)
 
     # ── Corpo principal ─────────────────────────────────────────────────────────
@@ -179,11 +180,11 @@ class App(tk.Tk):
         wrap.pack(fill="x", padx=28, pady=(18, 0))
 
         # Cabeçalho
-        hdr = tk.Frame(wrap, bg=CYAN)
+        hdr = tk.Frame(wrap, bg=GRAY)
         hdr.pack(fill="x")
         for col, w in [("Processo", 120), ("Tempo de Chegada", 260),
                        ("Tempo de Execução", 260), ("Ações", 80)]:
-            tk.Label(hdr, text=col, bg=CYAN, fg=WHITE,
+            tk.Label(hdr, text=col, bg=GRAY, fg=WHITE,
                      font=("Segoe UI", 10, "bold"),
                      width=w // 8, anchor="center",
                      pady=10).pack(side="left", expand=True, fill="x")
@@ -255,22 +256,22 @@ class App(tk.Tk):
         frm.pack(fill="x", padx=28, pady=(16, 0))
 
         btn_add = tk.Button(frm, text="＋  Adicionar Processo",
-                            bg=ORANGE, fg=WHITE,
+                            bg=CYAN, fg=WHITE,
                             font=("Segoe UI", 12, "bold"),
                             relief="flat", cursor="hand2", pady=12,
                             command=lambda: self._add_row())
         btn_add.pack(fill="x", pady=(0, 10))
 
         btn_run = tk.Button(frm, text="▶  Executar Simulação",
-                            bg=CYAN, fg=WHITE,
+                            bg=GRAY, fg=WHITE,
                             font=("Segoe UI", 12, "bold"),
                             relief="flat", cursor="hand2", pady=12,
                             command=self._run)
         btn_run.pack(fill="x")
 
         # hover effects
-        for btn, normal, hover in [(btn_add, ORANGE, "#fb8c00"),
-                                   (btn_run, CYAN, CYAN_DARK)]:
+        for btn, normal, hover in [(btn_add, GRAY, "#424242"),
+                                   (btn_run, CYAN, "#60d3e8")]:
             btn.bind("<Enter>", lambda e, b=btn, h=hover: b.config(bg=h))
             btn.bind("<Leave>", lambda e, b=btn, n=normal: b.config(bg=n))
 
@@ -320,7 +321,7 @@ class App(tk.Tk):
         tk.Label(self.results_frame, text="Gráfico de Gantt",
                  bg=BG, fg=TEXT, font=("Segoe UI", 13, "bold"),
                  anchor="w").pack(anchor="w", pady=(0, 6))
-        tk.Frame(self.results_frame, bg=CYAN, height=2).pack(fill="x", pady=(0, 10))
+        tk.Frame(self.results_frame, bg=GRAY, height=2).pack(fill="x", pady=(0, 10))
 
         card = tk.Frame(self.results_frame, bg=WHITE,
                         relief="solid", bd=1)
@@ -373,7 +374,7 @@ class App(tk.Tk):
         tk.Label(self.results_frame, text="Métricas por Processo",
                  bg=BG, fg=TEXT, font=("Segoe UI", 13, "bold"),
                  anchor="w").pack(anchor="w", pady=(0, 6))
-        tk.Frame(self.results_frame, bg=CYAN, height=2).pack(fill="x", pady=(0, 10))
+        tk.Frame(self.results_frame, bg=GRAY, height=2).pack(fill="x", pady=(0, 10))
 
         card = tk.Frame(self.results_frame, bg=WHITE, relief="solid", bd=1)
         card.pack(fill="x", pady=(0, 20))
@@ -381,10 +382,10 @@ class App(tk.Tk):
         cols = ["Processo", "Chegada", "Burst", "Conclusão", "Turnaround", "Espera"]
 
         # Cabeçalho
-        hdr = tk.Frame(card, bg=CYAN)
+        hdr = tk.Frame(card, bg=GRAY)
         hdr.pack(fill="x")
         for col in cols:
-            tk.Label(hdr, text=col, bg=CYAN, fg=WHITE,
+            tk.Label(hdr, text=col, bg=GRAY, fg=WHITE,
                      font=("Segoe UI", 10, "bold"),
                      anchor="center", pady=10,
                      width=12).pack(side="left", expand=True, fill="x")
