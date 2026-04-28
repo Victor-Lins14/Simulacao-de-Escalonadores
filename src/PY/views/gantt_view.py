@@ -21,7 +21,7 @@ def draw_gantt(parent, gantt):
 
     total = gantt[-1]["end"] if gantt else 0
     unit  = max(52, min(90, 700 // (total if total > 0 else 1)))
-    canvas.configure(scrollregion=(0, 0, total * unit + 40, 80))
+    canvas.configure(scrollregion=(-20, 0, total * unit + 40, 80))
 
     BAR_Y1, BAR_Y2, TICK_Y = 8, 48, 56
     
