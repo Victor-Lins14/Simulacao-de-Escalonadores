@@ -13,7 +13,7 @@ O simulador foi desenvolvido em duas versões idênticas visualmente e em funcio
    - Para rodar, execute o arquivo `src/PY/main.py` utilizando o Python 3.
 
 2. **Versão Web (JS):** Interface em HTML, CSS e JavaScript puro.
-   - Para rodar, basta dar um duplo clique no arquivo `index.html` na raiz do projeto (ou dentro da pasta `src/JS/PY_para_JS/`) para abrir no seu navegador padrão.
+   - Para rodar, basta dar um duplo clique no arquivo `index.html` na raiz do projeto (ou dentro da pasta `src/JS`) para abrir no seu navegador padrão.
 
 ## Métricas Calculadas
 - Tempo de Conclusão (Completion Time)
