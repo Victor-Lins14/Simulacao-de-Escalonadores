@@ -14,10 +14,12 @@ function roundRobin(procs, quantum) {
     const p = queue.shift();
     const ex = Math.min(quantum, p.remaining);
     
+    // Diagrama de Gantt
     gantt.push({pid: p.pid, start: t, end: t + ex, colorIdx: p.colorIdx});
     t += ex; 
     p.remaining -= ex;
     
+    // Verificar se chegaram novos processos durante a execução (queue)
     while (i < list.length && list[i].arrival <= t) {
       if (!inQ.has(list[i].pid)) { queue.push(list[i]); inQ.add(list[i].pid); }
       i++;

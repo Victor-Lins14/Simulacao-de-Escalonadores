@@ -1,18 +1,26 @@
-
 const COLORS = ['gc-0','gc-1','gc-2','gc-3','gc-4','gc-5','gc-6','gc-7'];
 const BADGE_BG  = ['#b2ebf2','#c8e6c9','#ffe0b2','#e1bee7','#fce4ec','#fff9c4','#b3e5fc','#dcedc8'];
 const BADGE_FG  = ['#006064','#1b5e20','#bf360c','#4a148c','#880e4f','#f57f17','#01579b','#33691e'];
 
-let counter = 0;
+// Ouvinte para ocultar/mostrar o Quantum de acordo com o Select
+document.getElementById('algorithm').addEventListener('change', function() {
+    const qWrapper = document.getElementById('quantum-wrapper');
+    const configRow = document.querySelector('.config-row'); // Pega o container do grid
+    
+    if (this.value === 'srtf') {
+        qWrapper.style.display = 'none';
+        configRow.style.gridTemplateColumns = '1fr'; // Faz a aba de seleção ocupar 100% do espaço
+    } else {
+        qWrapper.style.display = 'block';
+        configRow.style.gridTemplateColumns = '1fr 220px'; // Restaura o espaço de 220px do Quantum
+    }
+});
 
 function addRow(arr='', bst='') {
-  counter++;
-  const pid = 'P' + counter;
   const tbody = document.getElementById('proc-body');
   const tr = document.createElement('tr');
-  tr.dataset.pid = pid;
   tr.innerHTML = `
-    <td>${pid}</td>
+    <td class="td-pid"></td>
     <td><input type="number" class="arr-in" value="${arr}" min="0" placeholder="0"></td>
     <td><input type="number" class="bst-in" value="${bst}" min="1" placeholder="1"></td>
     <td>
@@ -23,10 +31,26 @@ function addRow(arr='', bst='') {
       </button>
     </td>`;
   tbody.appendChild(tr);
+  updateRows();
 }
 
 function delRow(btn) {
+  const tbody = document.getElementById('proc-body');
+  if (tbody.children.length <= 1) {
+      alert("É necessário pelo menos 1 processo.");
+      return;
+  }
   btn.closest('tr').remove();
+  updateRows(); 
+}
+
+function updateRows() {
+    const rows = document.querySelectorAll('#proc-body tr');
+    rows.forEach((tr, i) => {
+        const newPid = 'P' + (i + 1);
+        tr.dataset.pid = newPid;
+        tr.querySelector('.td-pid').textContent = newPid;
+    });
 }
 
 function getRows() {
@@ -39,37 +63,21 @@ function getRows() {
   }));
 }
 
-function roundRobin(procs, quantum) {
-  const list = procs.map(p => ({...p, remaining: p.burst})).sort((a,b) => a.arrival - b.arrival);
-  const queue = [], inQ = new Set();
-  const gantt = [], ct = {};
-  let t = 0, done = 0, i = 0;
-
-  while (done < list.length) {
-    while (i < list.length && list[i].arrival <= t) {
-      if (!inQ.has(list[i].pid)) { queue.push(list[i]); inQ.add(list[i].pid); }
-      i++;
-    }
-    if (!queue.length) { t = list[i].arrival; continue; }
-    const p = queue.shift();
-    const ex = Math.min(quantum, p.remaining);
-    gantt.push({pid: p.pid, start: t, end: t + ex, colorIdx: p.colorIdx});
-    t += ex; p.remaining -= ex;
-    while (i < list.length && list[i].arrival <= t) {
-      if (!inQ.has(list[i].pid)) { queue.push(list[i]); inQ.add(list[i].pid); }
-      i++;
-    }
-    if (p.remaining > 0) queue.push(p);
-    else { ct[p.pid] = t; done++; }
-  }
-  return { gantt, ct, total: t };
-}
-
 function runSim() {
   const procs = getRows();
   if (!procs.length) { alert('Adicione pelo menos um processo.'); return; }
-  const quantum = parseInt(document.getElementById('quantum').value) || 2;
-  const { gantt, ct, total } = roundRobin(procs, quantum);
+  
+  const algorithm = document.getElementById('algorithm').value;
+  let result;
+
+  if (algorithm === 'rr') {
+      const quantum = parseInt(document.getElementById('quantum').value) || 2;
+      result = roundRobin(procs, quantum);
+  } else if (algorithm === 'srtf') {
+      result = srtf(procs);
+  }
+
+  const { gantt, metrics, tme, tmt, total } = result;
 
   // GANTT
   const barsEl = document.getElementById('gantt-bars');
@@ -77,42 +85,64 @@ function runSim() {
   barsEl.innerHTML = '';
   tlEl.innerHTML   = '';
 
-  const totalW = Math.max(600, total * 52);
-  const unitW  = totalW / total;
+  // Força uma unidade de tempo a ter no mínimo 40px para evitar esmagamento visual
+  const UNIT = Math.max(50, 700 / (total > 0 ? total : 1));
+
+  let lastEnd = 0; // Sempre começa do zero para alinhar a régua
 
   gantt.forEach(g => {
-    const w = Math.round((g.end - g.start) * unitW);
+    // 1. Tratar o tempo OCIOSO (Lacuna entre processos)
+    if (g.start > lastEnd) {
+      const duration = g.start - lastEnd;
+      const w = duration * UNIT;
+      const div = document.createElement('div');
+      div.className = 'gantt-block';
+      div.style.width = w + 'px';
+      div.style.minWidth = w + 'px';
+      div.style.maxWidth = w + 'px';
+      // Fundo listrado e neutro para representar CPU Ociosa
+      div.style.background = 'repeating-linear-gradient(45deg, #f0f4f8, #f0f4f8 10px, #ffffff 10px, #ffffff 20px)';
+      div.innerHTML = `<span class="g-pid" style="color:#8090a0;">Ocioso</span><span class="g-range" style="color:#8090a0;">${lastEnd}–${g.start}</span>`;
+      barsEl.appendChild(div);
+    }
+
+    // 2. Tratar o bloco normal do processo
+    const duration = g.end - g.start;
+    const w = duration * UNIT;
     const div = document.createElement('div');
     div.className = 'gantt-block ' + COLORS[g.colorIdx];
+    
+    // Trava o tamanho nos 3 eixos para o CSS não desobedecer
     div.style.width = w + 'px';
     div.style.minWidth = w + 'px';
+    div.style.maxWidth = w + 'px';
+    
     div.innerHTML = `<span class="g-pid">${g.pid}</span><span class="g-range">${g.start}–${g.end}</span>`;
     barsEl.appendChild(div);
+
+    lastEnd = g.end; // Atualiza onde a última barra terminou
   });
 
-  // timeline ticks
+  // Timeline ticks
   const ticks = new Set(gantt.flatMap(g => [g.start, g.end]));
+  ticks.add(0); // Garante que a linha do tempo sempre inicie do 0
+
   [...ticks].sort((a,b)=>a-b).forEach((tick, idx, arr) => {
     const span = document.createElement('div');
     span.className = 'gantt-tick';
+    
     if (idx < arr.length - 1) {
       const nextTick = arr[idx + 1];
-      const w = Math.round((nextTick - tick) * unitW);
+      const w = (nextTick - tick) * UNIT;
       span.style.width = w + 'px';
       span.style.minWidth = w + 'px';
+      span.style.maxWidth = w + 'px';
     }
     span.textContent = tick;
     tlEl.appendChild(span);
   });
 
   // METRICS TABLE
-  const metrics = procs.map(p => ({
-    pid: p.pid, arrival: p.arrival, burst: p.burst,
-    ct: ct[p.pid],
-    tat: ct[p.pid] - p.arrival,
-    wt: ct[p.pid] - p.arrival - p.burst,
-    colorIdx: p.colorIdx
-  }));
   const mb = document.getElementById('metrics-body');
   mb.innerHTML = '';
   metrics.forEach(m => {
@@ -127,8 +157,6 @@ function runSim() {
     mb.appendChild(tr);
   });
 
-  const tme = metrics.reduce((s,m)=>s+m.wt, 0) / metrics.length;
-  const tmt = metrics.reduce((s,m)=>s+m.tat, 0) / metrics.length;
   document.getElementById('tme-val').textContent = tme.toFixed(2);
   document.getElementById('tmt-val').textContent = tmt.toFixed(2);
 
@@ -137,7 +165,7 @@ function runSim() {
   res.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Init with 3 example rows
+// Inicia com 3 processos padrão
 addRow(0, 4);
 addRow(1, 3);
 addRow(2, 5);
