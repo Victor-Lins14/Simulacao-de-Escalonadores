@@ -52,8 +52,6 @@ class App(tk.Tk):
         hdr.pack(fill="x")
         hdr.pack_propagate(False)
 
-        tk.Label(hdr, text="⚙", bg=GRAY, fg=WHITE,
-                 font=("Segoe UI Emoji", 20)).pack(side="left", padx=(18, 8), pady=10)
         tk.Label(hdr, text="Simulador de Escalonamento de CPU",
                  bg=GRAY, fg=WHITE,
                  font=("Segoe UI", 14, "bold")).pack(side="left", pady=10)
