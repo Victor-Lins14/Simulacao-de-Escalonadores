@@ -86,7 +86,7 @@ function runSim() {
   tlEl.innerHTML   = '';
 
   // Força uma unidade de tempo a ter no mínimo 40px para evitar esmagamento visual
-  const UNIT = Math.max(40, 700 / (total > 0 ? total : 1));
+  const UNIT = Math.max(50, 700 / (total > 0 ? total : 1));
 
   let lastEnd = 0; // Sempre começa do zero para alinhar a régua
 
