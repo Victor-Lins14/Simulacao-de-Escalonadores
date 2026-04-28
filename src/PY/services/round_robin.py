@@ -1,5 +1,6 @@
 from collections import deque
 
+
 def round_robin(processos, quantum):
     lista = [
         {**p, "remaining": p["burst"], "color_idx": p.get("color_idx", 0)}
@@ -53,5 +54,5 @@ def round_robin(processos, quantum):
 
     tme = sum(m["wt"]  for m in metricas) / len(metricas) if metricas else 0
     tmt = sum(m["tat"] for m in metricas) / len(metricas) if metricas else 0
-    
+
     return gantt, metricas, tme, tmt
