@@ -102,7 +102,7 @@ function runSim() {
       div.style.maxWidth = w + 'px';
       // Fundo listrado e neutro para representar CPU Ociosa
       div.style.background = 'repeating-linear-gradient(45deg, #f0f4f8, #f0f4f8 10px, #ffffff 10px, #ffffff 20px)';
-      div.innerHTML = `<span class="g-pid" style="color:#8090a0;">Ócio</span><span class="g-range" style="color:#8090a0;">${lastEnd}–${g.start}</span>`;
+      div.innerHTML = `<span class="g-pid" style="color:#8090a0;">Ocioso</span><span class="g-range" style="color:#8090a0;">${lastEnd}–${g.start}</span>`;
       barsEl.appendChild(div);
     }
 
