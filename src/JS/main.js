@@ -84,7 +84,25 @@ function runSim() {
   // Força uma unidade de tempo a ter no mínimo 40px para evitar esmagamento visual
   const UNIT = Math.max(40, 700 / (total > 0 ? total : 1));
 
+  let lastEnd = 0; // Sempre começa do zero para alinhar a régua
+
   gantt.forEach(g => {
+    // 1. Tratar o tempo OCIOSO (Lacuna entre processos)
+    if (g.start > lastEnd) {
+      const duration = g.start - lastEnd;
+      const w = duration * UNIT;
+      const div = document.createElement('div');
+      div.className = 'gantt-block';
+      div.style.width = w + 'px';
+      div.style.minWidth = w + 'px';
+      div.style.maxWidth = w + 'px';
+      // Fundo listrado e neutro para representar CPU Ociosa
+      div.style.background = 'repeating-linear-gradient(45deg, #f0f4f8, #f0f4f8 10px, #ffffff 10px, #ffffff 20px)';
+      div.innerHTML = `<span class="g-pid" style="color:#8090a0;">Ocioso</span><span class="g-range" style="color:#8090a0;">${lastEnd}–${g.start}</span>`;
+      barsEl.appendChild(div);
+    }
+
+    // 2. Tratar o bloco normal do processo
     const duration = g.end - g.start;
     const w = duration * UNIT;
     const div = document.createElement('div');
@@ -97,10 +115,14 @@ function runSim() {
     
     div.innerHTML = `<span class="g-pid">${g.pid}</span><span class="g-range">${g.start}–${g.end}</span>`;
     barsEl.appendChild(div);
+
+    lastEnd = g.end; // Atualiza onde a última barra terminou
   });
 
   // Timeline ticks
   const ticks = new Set(gantt.flatMap(g => [g.start, g.end]));
+  ticks.add(0); // Garante que a linha do tempo sempre inicie do 0
+
   [...ticks].sort((a,b)=>a-b).forEach((tick, idx, arr) => {
     const span = document.createElement('div');
     span.className = 'gantt-tick';
