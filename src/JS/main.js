@@ -5,10 +5,14 @@ const BADGE_FG  = ['#006064','#1b5e20','#bf360c','#4a148c','#880e4f','#f57f17','
 // Ouvinte para ocultar/mostrar o Quantum de acordo com o Select
 document.getElementById('algorithm').addEventListener('change', function() {
     const qWrapper = document.getElementById('quantum-wrapper');
+    const configRow = document.querySelector('.config-row'); // Pega o container do grid
+    
     if (this.value === 'srtf') {
         qWrapper.style.display = 'none';
+        configRow.style.gridTemplateColumns = '1fr'; // Faz a aba de seleção ocupar 100% do espaço
     } else {
         qWrapper.style.display = 'block';
+        configRow.style.gridTemplateColumns = '1fr 220px'; // Restaura o espaço de 220px do Quantum
     }
 });
 
@@ -98,7 +102,7 @@ function runSim() {
       div.style.maxWidth = w + 'px';
       // Fundo listrado e neutro para representar CPU Ociosa
       div.style.background = 'repeating-linear-gradient(45deg, #f0f4f8, #f0f4f8 10px, #ffffff 10px, #ffffff 20px)';
-      div.innerHTML = `<span class="g-pid" style="color:#8090a0;">Ocioso</span><span class="g-range" style="color:#8090a0;">${lastEnd}–${g.start}</span>`;
+      div.innerHTML = `<span class="g-pid" style="color:#8090a0;">Ócio</span><span class="g-range" style="color:#8090a0;">${lastEnd}–${g.start}</span>`;
       barsEl.appendChild(div);
     }
 
