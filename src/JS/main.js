@@ -169,3 +169,11 @@ function runSim() {
 addRow(0, 8);
 addRow(1, 5);
 addRow(1, 3);
+
+// Dispara o evento 'change' do select assim que a página carrega 
+// para garantir que a interface (como o campo Quantum) se ajuste ao algoritmo padrão.
+document.addEventListener('DOMContentLoaded', () => {
+    const selectAlg = document.getElementById('algorithm');
+    // Cria e dispara o evento manualmente
+    selectAlg.dispatchEvent(new Event('change'));
+});
