@@ -20,3 +20,5 @@ O simulador foi desenvolvido em duas versões idênticas visualmente e em funcio
 - Tempo de Turnaround
 - Tempo de Espera (Waiting Time)
 - TME (Tempo Médio de Espera) e TMT (Tempo Médio de Turnaround)
+
+## Site : https://victor-lins14.github.io/Simulacao-de-Escalonadores/src/JS/index.html
